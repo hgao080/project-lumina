@@ -20,13 +20,14 @@ dependencies {
     implementation(ktorLibs.server.contentNegotiation)
     implementation(ktorLibs.server.core)
     implementation(ktorLibs.server.netty)
+    implementation(ktorLibs.server.cors)
+
     implementation(libs.exposed.core)
     implementation(libs.exposed.r2dbc)
     implementation(libs.h2database.h2)
     implementation(libs.h2database.r2dbc)
     implementation(libs.logback.classic)
-    implementation("io.ktor:ktor-server-cors:3.5.0")
-    implementation("io.github.cdimascio:dotenv-kotlin:6.5.1")
+    implementation(libs.dotenv.kotlin)
 
     testImplementation(kotlin("test"))
     testImplementation(ktorLibs.server.testHost)
