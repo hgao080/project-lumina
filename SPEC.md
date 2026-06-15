@@ -180,6 +180,7 @@ NEXT_PUBLIC_PIN=       # Shared PIN sent with mutating requests
 PORT=                  # Port Ktor listens on (e.g. 8080)
 PIN=                   # Shared PIN validated on mutating routes
 DB_PATH=               # Path to SQLite file (e.g. ./data/pinboard.db)
+ALLOWED_ORIGIN=        # Bare Vercel hostname (e.g. lumina.vercel.app) — defaults to localhost:3000 if unset
 ```
 
 ---
