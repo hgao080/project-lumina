@@ -1,0 +1,8 @@
+ktor:
+  deployment:
+    port: 8080
+  application:
+    modules:
+      - com.projectlumina.SerializationKt.configureSerialization
+      - com.projectlumina.ExposedKt.configureExposed
+      - com.projectlumina.RoutingKt.configureRouting
