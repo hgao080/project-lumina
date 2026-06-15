@@ -23,9 +23,10 @@ dependencies {
     implementation(ktorLibs.server.cors)
 
     implementation(libs.exposed.core)
-    implementation(libs.exposed.r2dbc)
+    implementation(libs.exposed.jdbc)
+    implementation(libs.exposed.kotlin.datetime)
     implementation(libs.h2database.h2)
-    implementation(libs.h2database.r2dbc)
+    implementation(libs.kotlinx.datetime)
     implementation(libs.logback.classic)
     implementation(libs.dotenv.kotlin)
 
