@@ -12,5 +12,9 @@ fun Application.configureRouting() {
         get("/json/kotlinx-serialization") {
             call.respond(mapOf("hello" to "world"))
         }
+        // TODO: remove — temp CORS smoke test
+        get("/ping") {
+            call.respond(mapOf("status" to "ok"))
+        }
     }
 }

@@ -25,6 +25,8 @@ dependencies {
     implementation(libs.h2database.h2)
     implementation(libs.h2database.r2dbc)
     implementation(libs.logback.classic)
+    implementation("io.ktor:ktor-server-cors:3.5.0")
+    implementation("io.github.cdimascio:dotenv-kotlin:6.5.1")
 
     testImplementation(kotlin("test"))
     testImplementation(ktorLibs.server.testHost)
