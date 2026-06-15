@@ -45,7 +45,7 @@ User visits `/archive` → sees a list of past dates → taps a date → sees al
 | Quote polling | Display page refreshes data every 30–60s |
 | PIN auth | Shared secret protecting POST and PATCH routes |
 | Self-hosted backend | Runs on same device as projector, no cold starts |
-| Remote add access | Tailscale for reaching /add from phone off home network |
+| Remote add access | Cloudflare Tunnel public URL; no VPN needed on phone |
 
 ---
 
@@ -70,7 +70,7 @@ User visits `/archive` → sees a list of past dates → taps a date → sees al
 | Typography | Excalifont | User's stated preference, loaded via `next/font/local` |
 | Frontend hosting | Vercel | Zero-config for Next.js, free tier sufficient |
 | Backend hosting | Self-hosted on projector device | No cold starts, backend always running since the display needs it, no cloud compute bill |
-| Remote access | Tailscale | Private network between phone and home device, no exposed ports |
+| Remote access | Cloudflare Tunnel | Exposes Ktor backend via a public HTTPS URL; no port forwarding or VPN required; phone reaches `/add` and Vercel SSR can reach backend for server-rendered pages |
 
 ---
 
@@ -171,7 +171,7 @@ A shared PIN/secret is checked on all mutating routes (`POST /quotes`, `PATCH /q
 
 **Frontend** (Vercel):
 ```
-NEXT_PUBLIC_API_URL=   # URL of the self-hosted Ktor backend (e.g. Tailscale address)
+NEXT_PUBLIC_API_URL=   # Cloudflare Tunnel public URL of the self-hosted Ktor backend
 NEXT_PUBLIC_PIN=       # Shared PIN sent with mutating requests
 ```
 
@@ -186,4 +186,4 @@ DB_PATH=               # Path to SQLite file (e.g. ./data/pinboard.db)
 
 ## GitHub Issues
 
-See the project Kanban board. 24 issues cover the full MVP across the areas: Setup, Database, API, Auth, Frontend (Add / Display / Archive), and Self-hosting & Deployment.
+See the project Kanban board. Issues cover the full MVP across the areas: Setup, Database, API, Auth, Frontend (Add / Display / Archive), and Self-hosting & Deployment.
