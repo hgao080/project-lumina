@@ -1,5 +1,6 @@
-package com.projectlumina
+package com.projectlumina.plugins
 
+import com.projectlumina.dotenv
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.cors.routing.*

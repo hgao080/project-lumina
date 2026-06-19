@@ -3,7 +3,7 @@ ktor:
     port: 8080
   application:
     modules:
-      - com.projectlumina.CorsKt.installCors
-      - com.projectlumina.SerializationKt.configureSerialization
-      - com.projectlumina.ExposedKt.configureExposed
-      - com.projectlumina.RoutingKt.configureRouting
+      - com.projectlumina.plugins.CorsKt.installCors
+      - com.projectlumina.plugins.SerializationKt.configureSerialization
+      - com.projectlumina.plugins.DatabaseKt.configureDatabase
+      - com.projectlumina.plugins.RoutingKt.configureRouting
