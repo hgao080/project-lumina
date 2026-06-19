@@ -21,6 +21,7 @@ dependencies {
     implementation(ktorLibs.server.core)
     implementation(ktorLibs.server.netty)
     implementation(ktorLibs.server.cors)
+    implementation(ktorLibs.server.di)
 
     implementation(libs.exposed.core)
     implementation(libs.exposed.dao)

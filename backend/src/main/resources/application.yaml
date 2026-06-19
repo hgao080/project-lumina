@@ -6,4 +6,5 @@ ktor:
       - com.projectlumina.plugins.CorsKt.installCors
       - com.projectlumina.plugins.SerializationKt.configureSerialization
       - com.projectlumina.plugins.DatabaseKt.configureDatabase
+      - com.projectlumina.plugins.DependenciesKt.configureDependencies
       - com.projectlumina.plugins.RoutingKt.configureRouting
