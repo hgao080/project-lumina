@@ -51,7 +51,8 @@ User visits `/archive` → sees a list of past dates → taps a date → sees al
 
 ## Deferred / Future Features
 
-- **Configurable refresh period** (daily / weekly / monthly): the data model uses a generic `boardDate` string so this is a settings change later, not a schema rewrite
+- **Multi-user accounts**: each user owns their own daily boards and archives. `user_id` column already present in schema (stubbed) — auth layer + users table is the remaining work (#29)
+- **Configurable refresh period** (daily / weekly / monthly): `boardDate` is a first-class date column so this is a settings change later, not a schema rewrite
 - **Drag and drop between zones**: the PATCH endpoint for toggling `isPermanent` already covers the data mutation; drag-and-drop on a touchscreen is a frontend-only addition when needed
 - **Collage-style layout**: quote cards arranged aesthetically rather than in a uniform grid
 - **Multiple categories per quote**: current schema supports one `category` string, can be extended to an array later
@@ -64,7 +65,7 @@ User visits `/archive` → sees a list of past dates → taps a date → sees al
 |---|---|---|
 | Backend language | Kotlin | Learning goal; JVM ecosystem overlaps with Java/Spring Boot for job-market relevance |
 | Backend framework | Ktor | Idiomatic Kotlin, coroutine-native, lightweight |
-| Database | SQLite via Exposed | Single file, zero network dependency, survives home internet outage, Exposed is JetBrains' own Kotlin SQL DSL |
+| Database | H2 via Exposed | Single file, zero network dependency, survives home internet outage, Exposed is JetBrains' own Kotlin SQL DSL. Sufficient for single-user load. |
 | Frontend framework | Next.js (App Router, TypeScript) | Familiar stack, three simple routes, no API routes needed (all handled by Ktor) |
 | Styling | Tailwind CSS | Utility-first, pairs well with minimal design direction |
 | Typography | Excalifont | User's stated preference, loaded via `next/font/local` |
@@ -82,16 +83,21 @@ User visits `/archive` → sees a list of past dates → taps a date → sees al
 │   ├── src/
 │   │   └── main/
 │   │       └── kotlin/
-│   │           ├── Application.kt
-│   │           ├── db/
-│   │           │   ├── Database.kt
-│   │           │   └── QuotesTable.kt
-│   │           ├── models/
-│   │           │   └── Quote.kt
-│   │           ├── repositories/
-│   │           │   └── QuoteRepository.kt
-│   │           └── routes/
-│   │               └── QuoteRoutes.kt
+│   │           └── com/projectlumina/
+│   │               ├── Application.kt
+│   │               ├── Env.kt
+│   │               ├── plugins/
+│   │               │   ├── Cors.kt
+│   │               │   ├── Database.kt
+│   │               │   ├── Dependencies.kt   # Ktor DI registrations
+│   │               │   ├── Routing.kt
+│   │               │   └── Serialization.kt
+│   │               └── quotes/               # Feature package
+│   │                   ├── QuoteDb.kt        # Exposed table + DAO
+│   │                   ├── QuoteModel.kt     # Quote, QuoteInsert data classes
+│   │                   ├── QuoteRepository.kt
+│   │                   ├── ExposedQuoteRepository.kt
+│   │                   └── QuoteRouting.kt
 │   └── build.gradle.kts
 ├── frontend/         # Next.js application
 │   ├── app/
@@ -114,24 +120,28 @@ User visits `/archive` → sees a list of past dates → taps a date → sees al
 Single `quotes` table managed by Exposed:
 
 ```kotlin
-object QuotesTable : Table("quotes") {
-    val id          = integer("id").autoIncrement()
+object QuoteTable : UUIDTable("quotes") {
+    val userId      = uuid("user_id")             // stub: single hardcoded UUID until auth ships (#29)
     val text        = text("text")
-    val author      = varchar("author", 255).nullable()
-    val category    = varchar("category", 100).nullable()
+    val author      = varchar("author", 255)
+    val category    = varchar("category", 50)
     val isPermanent = bool("is_permanent").default(false)
-    val boardDate   = varchar("board_date", 10)   // "YYYY-MM-DD", NZ timezone
-    val createdAt   = long("created_at")           // epoch millis
-    val updatedAt   = long("updated_at")           // epoch millis
-
-    override val primaryKey = PrimaryKey(id)
+    val boardDate   = date("board_date")           // kotlinx-datetime LocalDate
+    val createdAt   = datetime("created_at")       // kotlinx-datetime LocalDateTime, UTC
+    val updatedAt   = datetime("updated_at")       // kotlinx-datetime LocalDateTime, UTC
 }
 ```
 
 **Key design decisions:**
-- `boardDate` is computed server-side from NZ local time at creation (`Pacific/Auckland`), not derived from the UTC `createdAt` timestamp — avoids day-boundary bugs
+- UUID primary key (via Exposed `UUIDTable`) — safe for future multi-user sharding, no sequential ID leakage
+- `userId` stubbed now (#29) so the schema needs no migration when auth ships — all queries already filter by it
+- `boardDate` is a native `date` column (not a varchar string) — Exposed + kotlinx-datetime handle serialisation
 - No `Board` entity exists. A "board" is simply the result of querying `WHERE board_date = ? AND is_permanent = false`
 - An empty board is zero rows — no null records or placeholder documents needed
+- `createdAt` / `updatedAt` stored in UTC; display conversion is a frontend concern
+
+**Open question — `boardDate` computation (#7):**
+The spec says `POST /quotes` should compute `boardDate` server-side in `Pacific/Auckland` time. The current `QuoteInsert` model has `boardDate` as a client-supplied field. Needs a decision at `POST /quotes` implementation: server-compute (simpler, NZ-only) vs client-supplied (see also #28).
 
 ---
 
@@ -179,7 +189,7 @@ NEXT_PUBLIC_PIN=       # Shared PIN sent with mutating requests
 ```
 PORT=                  # Port Ktor listens on (e.g. 8080)
 PIN=                   # Shared PIN validated on mutating routes
-DB_PATH=               # Path to SQLite file (e.g. ./data/pinboard.db)
+DB_PATH=               # Path to H2 file (e.g. ./data/lumina)
 ALLOWED_ORIGIN=        # Bare Vercel hostname (e.g. lumina.vercel.app) — defaults to localhost:3000 if unset
 ```
 
