@@ -25,7 +25,7 @@ class ExposedQuoteRepository : QuoteRepository {
             author      = input.author
             category    = input.category
             isPermanent = input.isPermanent
-            boardDate   = input.boardDate
+            boardDate   = Clock.System.now().toLocalDateTime(TimeZone.of("Pacific/Auckland")).date
             createdAt   = now
             updatedAt   = now
         })
