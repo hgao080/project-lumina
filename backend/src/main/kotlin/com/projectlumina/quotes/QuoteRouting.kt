@@ -1,5 +1,7 @@
 package com.projectlumina.quotes
 
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.request.receive
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.datetime.TimeZone
@@ -14,6 +16,12 @@ fun Route.quoteRoutes(repository: QuoteRepository) {
                 .filter { !it.isPermanent }
 
             call.respond(quotes)
+        }
+
+        post {
+            val input = call.receive<QuoteInsert>()
+            val quote = repository.insert(input)
+            call.respond(HttpStatusCode.Created, quote)
         }
     }
 }

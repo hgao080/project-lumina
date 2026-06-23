@@ -21,7 +21,6 @@ data class QuoteInsert(
     val text: String,
     val author: String,
     val category: String,
-    val boardDate: LocalDate,
     val isPermanent: Boolean = false,
 )
 
