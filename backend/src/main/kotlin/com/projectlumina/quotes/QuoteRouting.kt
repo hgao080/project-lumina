@@ -15,5 +15,10 @@ fun Route.quoteRoutes(repository: QuoteRepository) {
 
             call.respond(quotes)
         }
+
+        get("/archive") {
+            val dates = repository.getArchiveDates()
+            call.respond(dates)
+        }
     }
 }
