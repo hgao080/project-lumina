@@ -15,5 +15,11 @@ fun Route.quoteRoutes(repository: QuoteRepository) {
 
             call.respond(quotes)
         }
+
+        get("/permanent") {
+            val quotes = repository.getPermanent()
+            
+            call.respond(quotes)
+        }
     }
 }
